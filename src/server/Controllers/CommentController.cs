@@ -33,7 +33,7 @@ namespace server.Controllers
         public IEnumerable<CommentTransport> GetNextComments([FromBody]CommentState cs)
         {
             var user = context.User.FirstOrDefault(u => u.login == HttpContext.Session.GetString("Username"));
-            List<Comment> comments = null;
+            List<Comment> comments = new List<Comment>();
 
             if (cs.lastCommentId == -1)
             {
@@ -46,10 +46,6 @@ namespace server.Controllers
                     .OrderByDescending(comment => comment.id)
                     .Where(comment => cs.lastCommentId > comment.id)
                     .Take(20).ToList();
-            }
-            if (comments.Count == 0)
-            {
-                return null;
             }
 
             var users = (from u in context.User
@@ -93,12 +89,13 @@ namespace server.Controllers
         }
 
         [HttpPost("delete")]
-        public IActionResult DeleteComment([FromBody]Comment comment)
+       public IActionResult DeleteComment([FromBody]Comment comment)
         {
             var user = context.User.FirstOrDefault(u => u.login == HttpContext.Session.GetString("Username"));
-            if (ModelState.IsValid && comment.id_user == user.id)
+            Comment realComment = context.Comment.FirstOrDefault(c => c.id == comment.id);
+            if (ModelState.IsValid && realComment.id_user == user.id)
             {
-                context.Comment.Remove(context.Comment.FirstOrDefault(x => x.id == user.id));
+                context.Comment.Remove(realComment);
                 context.SaveChanges();
                 return Ok();
             }

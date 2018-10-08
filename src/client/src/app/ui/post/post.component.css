@@ -45,5 +45,10 @@ input{
 .btn-action {
     background-color: transparent;
     border: none;
-    outline: none;
+}
+
+.post-container .show-modal{
+   cursor: pointer;
+   display: block;
+   outline: none;
 }
